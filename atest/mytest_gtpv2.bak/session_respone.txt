@@ -1,0 +1,41 @@
+*** Settings ***
+Test Setup        Create server and client, and define protocol
+Test Teardown     Reset Rammbock
+Default Tags      regression
+Resource          gtpv2_resource.robot
+Resource          gtpv2_ie.robot
+
+*** Test Cases ***
+Create Session Response
+    Receive and Validate Create Session Request
+    Create Session Response
+    Create Session Response Values
+    client sends message    header:sequence number:48
+
+*** Keywords ***
+Receive and Validate Create Session Request
+    ${msg}=    Server Receives message    header:sequence number:48    timeout=1
+
+Create Session Response Values
+    ip value    F-TEID.value.f-teid_ipv4    172.1.1.60
+    value    F-TEID.value.values.interface type    7
+    ip value    Bearer context.value.F-TEID.value.f-teid_ipv4    172.1.1.60
+    value    Bearer context.value.F-TEID.value.values.interface type    7
+    value    Aggregate maximum bit rate.value.ambr_uplink    2
+    value    Aggregate maximum bit rate.value.ambr_downlink    1
+    value    Bearer context.value.eps_bearer_id.value.epsbid.value    5
+    value    Bearer context.value.bearer_level_qos.value.arp.pl    1
+    value    Bearer context.value.bearer_level_qos.value.label    9
+    value    Recovery.value.recovery    1
+    value    Cause.value.cause_value    1
+
+Create Session Response
+    new message    create session Response    gtpv2    header:message type:${CREATE SESSION Response}
+    IE    Cause
+    IE    F-TEID
+    IE    APN
+    IE    PDN Address Allocation
+    IE    Aggregate maximum bit rate
+    IE    APCO
+    IE    Bearer context
+    IE    Recovery
